@@ -288,28 +288,32 @@ pub fn writeListElement(node: Node, ctx: *const WriteContext) anyerror!void {
 }
 
 pub fn writeTextElement(node: Node, ctx: *const WriteContext) anyerror!void {
+    var text: []const u8 = try node.getText();
+
     const replaced_newlines = try std.mem.replaceOwned(
         u8,
         ctx.allocator,
-        try node.getText(),
+        text,
         "\n",
         "\n\n",
     );
     defer ctx.allocator.free(replaced_newlines);
-    var t: []const u8 = replaced_newlines;
+    text = replaced_newlines;
+
     var replaced_tabs: ?[]const u8 = null;
     defer if (replaced_tabs != null) ctx.allocator.free(replaced_tabs.?);
     if (ctx.convert_tab_size) |convert_tab_size| {
         replaced_tabs = try std.mem.replaceOwned(
             u8,
             ctx.allocator,
-            replaced_newlines,
+            text,
             "\t",
             spaces[0..convert_tab_size],
         );
-        t = replaced_tabs.?;
+        text = replaced_tabs.?;
     }
-    try ctx.writer.writeAll(t);
+
+    try ctx.writer.writeAll(text);
     try ctx.writer.flush();
 }
 
@@ -347,21 +351,21 @@ pub fn writeCodeElement(node: Node, ctx: *const WriteContext) !void {
 pub fn writeAllChildrenText(node: Node, ctx: *const WriteContext) !void {
     var it = node.iterator(.{ .type = .text });
     while (it.next()) |child| {
-        var text: []const u8 = undefined;
+        var text: []const u8 = try child.getText();
+
         var replaced_tabs: ?[]const u8 = null;
         defer if (replaced_tabs != null) ctx.allocator.free(replaced_tabs.?);
         if (ctx.convert_tab_size) |convert_tab_size| {
             replaced_tabs = try std.mem.replaceOwned(
                 u8,
                 ctx.allocator,
-                try child.getText(),
+                text,
                 "\t",
                 spaces[0..convert_tab_size],
             );
             text = replaced_tabs.?;
-        } else {
-            text = try child.getText();
         }
+
         try ctx.writer.writeAll(text);
     }
 }
