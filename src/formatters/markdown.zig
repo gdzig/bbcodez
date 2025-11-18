@@ -101,7 +101,7 @@ pub const Options = struct {
     /// custom element handlers for application-specific rendering logic.
     user_data: ?*anyopaque = null,
 
-    /// TODO: write docs :)
+    /// Optional number of spaces to convert tabs to.
     convert_tab_size: ?u8 = null,
 };
 

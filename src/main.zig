@@ -37,7 +37,7 @@ pub fn main() !void {
                 },
                 .{
                     .long_name = "convert_tab_size",
-                    .help = "Convert tabs to given number of spaces",
+                    .help = "Convert tabs to given number of spaces within [0, 255]",
                     .value_ref = r.mkRef(&config.convert_tab_size),
                 },
             }),
@@ -50,15 +50,21 @@ pub fn main() !void {
 }
 
 fn processConfig() !void {
+    const input_source: StreamSource = if (config.input == null) .stdin else .file;
+    const output_source: StreamDestination = if (config.output == null) .stdout else .file;
+    const convert_tab_size: ?u8 = if (config.convert_tab_size == null)
+        null
+    else
+        std.fmt.parseInt(u8, config.convert_tab_size.?, 10) catch {
+            std.log.err("convert_tab_size must be an integer in range of [0, 255]", .{});
+            return error.ConvertTabSizeInvalid;
+        };
+
     var input_file: File = undefined;
     defer input_file.close();
 
     var output_file: File = undefined;
     defer output_file.close();
-
-    const input_source: StreamSource = if (config.input == null) .stdin else .file;
-    const output_source: StreamDestination = if (config.output == null) .stdout else .file;
-    const convert_tab_size: ?u8 = if (config.convert_tab_size == null) null else try std.fmt.parseInt(u8, config.convert_tab_size.?, 10);
 
     switch (input_source) {
         .file => {
