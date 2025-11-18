@@ -16,12 +16,12 @@ A Zig library for parsing and formatting BBCode.
 Add bbcodez to your Zig project
 
 ```bash
-zig fetch --save git+https://github.com/DoubleWord-Labs/bbcodez.git
+zig fetch --save git+https://github.com/gdzig/bbcodez.git
 ```
 
 ## Documentation
 
-See: https://doubleword-labs.github.io/bbcodez/
+See: https://gdzig.github.io/bbcodez/
 
 ## Building
 
