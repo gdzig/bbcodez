@@ -313,23 +313,23 @@ fn canBeEscaped(byte: u8) bool {
     return std.mem.indexOfAny(u8, &.{byte}, escape_chars) != null;
 }
 
-fn isNewlineString(str: []const u8) bool {
-    if (str.len != 2) {
-        return false;
-    }
+// fn isNewlineString(str: []const u8) bool {
+//     if (str.len != 2) {
+//         return false;
+//     }
 
-    switch (str[0]) {
-        '\\' => {},
-        else => {
-            return false;
-        },
-    }
+//     switch (str[0]) {
+//         '\\' => {},
+//         else => {
+//             return false;
+//         },
+//     }
 
-    switch (str[1]) {
-        'n' => return true,
-        else => return false,
-    }
-}
+//     switch (str[1]) {
+//         'n' => return true,
+//         else => return false,
+//     }
+// }
 
 const State = enum {
     text,
@@ -422,10 +422,12 @@ pub fn tokenize(allocator: std.mem.Allocator, reader: *std.io.Reader, options: O
                 // append next byte
                 byte = next_byte;
                 escaped = true;
-            } else if (isNewlineString(&.{ byte, next_byte })) {
-                byte = '\n';
-                escaped = true;
-            } else {
+            }
+            //  else if (isNewlineString(&.{ byte, next_byte })) {
+            //     byte = '\n';
+            //     escaped = true;
+            // }
+            else {
                 // continue with next byte
                 try parsed.buffer.append(allocator, byte);
                 byte = next_byte;

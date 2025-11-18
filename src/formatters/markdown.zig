@@ -79,6 +79,8 @@ pub const WriteContext = struct {
     write_element_fn: ?WriteElementFunction = null,
     /// Optional user data for custom handlers
     user_data: ?*anyopaque = null,
+    /// Optional number of spaces to convert tabs to.
+    convert_tab_size: ?u8 = null,
 };
 
 /// Configuration options for Markdown rendering.
@@ -98,6 +100,9 @@ pub const Options = struct {
     /// This data is available in the WriteContext and can be used by
     /// custom element handlers for application-specific rendering logic.
     user_data: ?*anyopaque = null,
+
+    /// TODO: write docs :)
+    convert_tab_size: ?u8 = null,
 };
 
 pub const MarkdownElement = enum {
@@ -153,6 +158,7 @@ pub fn renderDocument(allocator: Allocator, doc: Document, writer: *std.io.Write
         .writer = writer,
         .write_element_fn = options.write_element_fn,
         .user_data = options.user_data,
+        .convert_tab_size = options.convert_tab_size,
     };
 
     try render(doc.root, &ctx);
@@ -282,16 +288,28 @@ pub fn writeListElement(node: Node, ctx: *const WriteContext) anyerror!void {
 }
 
 pub fn writeTextElement(node: Node, ctx: *const WriteContext) anyerror!void {
-    const text = try std.mem.replaceOwned(
+    const replaced_newlines = try std.mem.replaceOwned(
         u8,
         ctx.allocator,
         try node.getText(),
         "\n",
         "\n\n",
     );
-    defer ctx.allocator.free(text);
-
-    try ctx.writer.writeAll(text);
+    defer ctx.allocator.free(replaced_newlines);
+    var t: []const u8 = replaced_newlines;
+    var replaced_tabs: ?[]const u8 = null;
+    defer if (replaced_tabs != null) ctx.allocator.free(replaced_tabs.?);
+    if (ctx.convert_tab_size) |convert_tab_size| {
+        replaced_tabs = try std.mem.replaceOwned(
+            u8,
+            ctx.allocator,
+            replaced_newlines,
+            "\t",
+            spaces[0..convert_tab_size],
+        );
+        t = replaced_tabs.?;
+    }
+    try ctx.writer.writeAll(t);
     try ctx.writer.flush();
 }
 
@@ -329,7 +347,22 @@ pub fn writeCodeElement(node: Node, ctx: *const WriteContext) !void {
 pub fn writeAllChildrenText(node: Node, ctx: *const WriteContext) !void {
     var it = node.iterator(.{ .type = .text });
     while (it.next()) |child| {
-        try ctx.writer.writeAll(try child.getText());
+        var text: []const u8 = undefined;
+        var replaced_tabs: ?[]const u8 = null;
+        defer if (replaced_tabs != null) ctx.allocator.free(replaced_tabs.?);
+        if (ctx.convert_tab_size) |convert_tab_size| {
+            replaced_tabs = try std.mem.replaceOwned(
+                u8,
+                ctx.allocator,
+                try child.getText(),
+                "\t",
+                spaces[0..convert_tab_size],
+            );
+            text = replaced_tabs.?;
+        } else {
+            text = try child.getText();
+        }
+        try ctx.writer.writeAll(text);
     }
 }
 
@@ -504,3 +537,5 @@ const Document = @import("../Document.zig");
 const std = @import("std");
 const testing = std.testing;
 const logger = std.log.scoped(.markdown_formatter);
+
+const spaces: []const u8 = " " ** 255;

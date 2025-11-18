@@ -5,6 +5,7 @@ pub const std_options: Options = .{
 var config = struct {
     input: ?[]const u8 = null,
     output: ?[]const u8 = null,
+    convert_tab_size: ?[]const u8 = null,
 }{};
 
 const StreamSource = enum {
@@ -34,6 +35,11 @@ pub fn main() !void {
                     .help = "output file",
                     .value_ref = r.mkRef(&config.output),
                 },
+                .{
+                    .long_name = "convert_tab_size",
+                    .help = "Convert tabs to given number of spaces",
+                    .value_ref = r.mkRef(&config.convert_tab_size),
+                },
             }),
             .target = cli.CommandTarget{
                 .action = cli.CommandAction{ .exec = processConfig },
@@ -52,6 +58,7 @@ fn processConfig() !void {
 
     const input_source: StreamSource = if (config.input == null) .stdin else .file;
     const output_source: StreamDestination = if (config.output == null) .stdout else .file;
+    const convert_tab_size: ?u8 = if (config.convert_tab_size == null) null else try std.fmt.parseInt(u8, config.convert_tab_size.?, 10);
 
     switch (input_source) {
         .file => {
@@ -86,7 +93,9 @@ fn processConfig() !void {
     const document = try lib.load(allocator, reader, .{});
     defer document.deinit();
 
-    try renderDocument(allocator, document, writer, .{});
+    try renderDocument(allocator, document, writer, .{
+        .convert_tab_size = convert_tab_size,
+    });
 }
 
 const cwd = std.fs.cwd;
