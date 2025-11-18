@@ -64,7 +64,7 @@ fn processConfig() !void {
 
     switch (output_source) {
         .file => {
-            output_file = try cwd().openFile(config.output.?, .{});
+            output_file = try cwd().createFile(config.output.?, .{});
         },
         .stdout => {
             output_file = std.fs.File.stdout();

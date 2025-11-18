@@ -292,6 +292,7 @@ pub fn writeTextElement(node: Node, ctx: *const WriteContext) anyerror!void {
     defer ctx.allocator.free(text);
 
     try ctx.writer.writeAll(text);
+    try ctx.writer.flush();
 }
 
 pub fn writeListItemElement(node: Node, ctx: *const WriteContext) anyerror!void {
