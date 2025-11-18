@@ -74,17 +74,19 @@ fn processConfig() !void {
     var in_buf: [1024]u8 = undefined;
     var out_buf: [1024]u8 = undefined;
 
-    var reader = input_file.reader(&in_buf).interface;
-    var writer = output_file.writer(&out_buf).interface;
+    var file_reader = input_file.reader(&in_buf);
+    const reader = &file_reader.interface;
+    var file_writer = output_file.writer(&out_buf);
+    const writer = &file_writer.interface;
 
     var arena = ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const document = try lib.load(allocator, &reader, .{});
+    const document = try lib.load(allocator, reader, .{});
     defer document.deinit();
 
-    try renderDocument(allocator, document, &writer, .{});
+    try renderDocument(allocator, document, writer, .{});
 }
 
 const cwd = std.fs.cwd;
