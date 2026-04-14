@@ -92,4 +92,4 @@ Tests are embedded in each module using Zig's built-in testing framework. Run `z
 ## Dependencies
 
 - Uses `cli` dependency for command-line argument parsing in the executable
-- Requires Zig 0.15.1 (specified in `mise.toml`)
+- Requires Zig 0.16.0 (specified in `mise.toml`)

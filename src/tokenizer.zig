@@ -268,7 +268,7 @@ pub const TokenResult = struct {
 /// Returns: TokenResult containing all parsed tokens
 /// Errors: OutOfMemory if allocation fails during tokenization
 pub fn tokenizeBuffer(allocator: std.mem.Allocator, buffer: []const u8, options: Options) !TokenResult {
-    var fixed_reader = std.io.Reader.fixed(buffer);
+    var fixed_reader = std.Io.Reader.fixed(buffer);
 
     var tokenizer = try tokenize(allocator, &fixed_reader, options);
     try tokenizer.buffer.ensureTotalCapacity(allocator, buffer.len);
@@ -383,7 +383,7 @@ fn getTagName(tag: []const u8) []const u8 {
 ///   options: Tokenization configuration options
 /// Returns: TokenResult containing all parsed tokens
 /// Errors: OutOfMemory if allocation fails, or any reader errors
-pub fn tokenize(allocator: std.mem.Allocator, reader: *std.io.Reader, options: Options) !TokenResult {
+pub fn tokenize(allocator: std.mem.Allocator, reader: *std.Io.Reader, options: Options) !TokenResult {
     var state: State = .text;
     var start: usize = 0;
     var last_byte: u8 = 0;

@@ -1,4 +1,5 @@
 zig-out/
+zig-pkg/
 .zig-cache/
 .claude/settings.local.json
 .DS_store

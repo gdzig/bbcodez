@@ -74,7 +74,7 @@ pub const WriteContext = struct {
     /// The document being rendered
     document: Document,
     /// Output writer for the generated Markdown
-    writer: *std.io.Writer,
+    writer: *std.Io.Writer,
     /// Optional custom element handler function
     write_element_fn: ?WriteElementFunction = null,
     /// Optional user data for custom handlers
@@ -151,7 +151,7 @@ const element_map = std.StaticStringMap(MarkdownElement).initComptime(&.{
 ///   writer: Output writer for the Markdown text
 ///   options: Rendering configuration options
 /// Errors: Any writer errors or allocation failures during rendering
-pub fn renderDocument(allocator: Allocator, doc: Document, writer: *std.io.Writer, options: Options) !void {
+pub fn renderDocument(allocator: Allocator, doc: Document, writer: *std.Io.Writer, options: Options) !void {
     var ctx: WriteContext = .{
         .allocator = allocator,
         .document = doc,
@@ -406,11 +406,11 @@ test render {
     var document = try Document.loadFromBuffer(testing.allocator, bbcode_document, .{});
     defer document.deinit();
 
-    var file = try std.fs.cwd().createFile("snapshots/md/basic.md", .{});
-    defer file.close();
+    var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/basic.md", .{});
+    defer file.close(testing.io);
 
     var buf: [1024]u8 = undefined;
-    var file_writer = file.writer(&buf);
+    var file_writer = file.writer(testing.io, &buf);
     var writer = &file_writer.interface;
 
     try renderDocument(testing.allocator, document, writer, .{});
@@ -423,11 +423,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[b]hello, world![/b]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_bold.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_bold.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -437,11 +437,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[email=user@example.com]Email[/email]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_email.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_email.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -451,11 +451,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[url=https://example.com]Link[/url]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_url.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_url.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -465,11 +465,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[code]code[/code]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_code.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_code.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -479,11 +479,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[i]italic[/i]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_italic.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_italic.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -493,11 +493,11 @@ test "single lines" {
         var document = try Document.loadFromBuffer(testing.allocator, "[b]Hello[/b], world! [i]italic[/i] [u]underline[/u] [s]strike[/s]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_mixed.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_mixed.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -509,11 +509,11 @@ test "lists" {
         var document = try Document.loadFromBuffer(testing.allocator, "[list][*]item 1[*]item 2[/list]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/single_line_list.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_list.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();
@@ -523,11 +523,11 @@ test "lists" {
         var document = try Document.loadFromBuffer(testing.allocator, "[list]\n[*] item 1\n[*] item 2\n[/list]", .{});
         defer document.deinit();
 
-        var file = try std.fs.cwd().createFile("snapshots/md/multi_line_list.md", .{});
-        defer file.close();
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/multi_line_list.md", .{});
+        defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;
-        var file_writer = file.writer(&buf);
+        var file_writer = file.writer(testing.io, &buf);
         var writer = &file_writer.interface;
         try renderDocument(testing.allocator, document, writer, .{});
         try writer.flush();

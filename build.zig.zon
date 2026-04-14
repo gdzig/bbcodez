@@ -2,13 +2,8 @@
     .name = .bbcodez,
     .version = "0.0.1-dev",
     .fingerprint = 0x9e2aa21706ce5a62, // Changing this has security and trust implications.
-    .minimum_zig_version = "0.15.1",
-    .dependencies = .{
-        .cli = .{
-            .url = "git+https://github.com/sam701/zig-cli#f9a516ddc9771ddd2c8c46a280a9ab6cab8261f2",
-            .hash = "cli-0.10.0-2eKe_5kEAQBeHqKxUHNTGnETzu81rqKWwT1WPt1jXBt0",
-        },
-    },
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{},
     .paths = .{
         "build.zig",
         "build.zig.zon",

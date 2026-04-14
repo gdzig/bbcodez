@@ -2,97 +2,60 @@ pub const std_options: Options = .{
     .log_level = Level.err,
 };
 
-var config = struct {
-    input: ?[]const u8 = null,
-    output: ?[]const u8 = null,
-    convert_tab_size: ?[]const u8 = null,
-}{};
+pub fn main(init: std.process.Init) !void {
+    const io = init.io;
+    var out_buf: [1024]u8 = undefined;
+    var input_path: ?[]const u8 = null;
+    var output_path: ?[]const u8 = null;
+    var convert_tab_size_str: ?[]const u8 = null;
 
-const StreamSource = enum {
-    file,
-    stdin,
-};
+    var args = std.process.Args.Iterator.init(init.minimal.args);
+    _ = args.skip(); // skip program name
+    while (args.next()) |arg| {
+        if (std.mem.eql(u8, arg, "--help") or std.mem.eql(u8, arg, "-h")) {
+            var stderr = File.stderr().writer(io, &out_buf);
+            stderr.interface.print(usage, .{}) catch {};
+            try stderr.interface.flush();
+            return;
+        } else if (std.mem.eql(u8, arg, "--input") or std.mem.eql(u8, arg, "-i")) {
+            input_path = args.next() orelse return error.MissingArgValue;
+        } else if (std.mem.eql(u8, arg, "--output") or std.mem.eql(u8, arg, "-o")) {
+            output_path = args.next() orelse return error.MissingArgValue;
+        } else if (std.mem.eql(u8, arg, "--convert-tab-size")) {
+            convert_tab_size_str = args.next() orelse return error.MissingArgValue;
+        }
+    }
 
-const StreamDestination = enum {
-    file,
-    stdout,
-};
-
-pub fn main() !void {
-    var r = try cli.AppRunner.init(std.heap.page_allocator);
-
-    const app = cli.App{
-        .command = cli.Command{
-            .name = "bbcodez",
-            .options = try r.allocOptions(&.{
-                .{
-                    .long_name = "input",
-                    .help = "input file",
-                    .value_ref = r.mkRef(&config.input),
-                },
-                .{
-                    .long_name = "output",
-                    .help = "output file",
-                    .value_ref = r.mkRef(&config.output),
-                },
-                .{
-                    .long_name = "convert_tab_size",
-                    .help = "Convert tabs to given number of spaces within [0, 255]",
-                    .value_ref = r.mkRef(&config.convert_tab_size),
-                },
-            }),
-            .target = cli.CommandTarget{
-                .action = cli.CommandAction{ .exec = processConfig },
-            },
-        },
-    };
-    return r.run(&app);
-}
-
-fn processConfig() !void {
-    const input_source: StreamSource = if (config.input == null) .stdin else .file;
-    const output_source: StreamDestination = if (config.output == null) .stdout else .file;
-    const convert_tab_size: ?u8 = if (config.convert_tab_size == null)
-        null
-    else
-        std.fmt.parseInt(u8, config.convert_tab_size.?, 10) catch {
+    const convert_tab_size: ?u8 = if (convert_tab_size_str) |s|
+        std.fmt.parseInt(u8, s, 10) catch {
             std.log.err("convert_tab_size must be an integer in range of [0, 255]", .{});
             return error.ConvertTabSizeInvalid;
-        };
+        }
+    else
+        null;
 
-    var input_file: File = undefined;
-    defer input_file.close();
+    const cwd = std.Io.Dir.cwd();
 
-    var output_file: File = undefined;
-    defer output_file.close();
+    const input_file: File = if (input_path) |p|
+        try cwd.openFile(io, p, .{})
+    else
+        File.stdin();
+    defer if (input_path != null) input_file.close(io);
 
-    switch (input_source) {
-        .file => {
-            input_file = try cwd().openFile(config.input.?, .{});
-        },
-        .stdin => {
-            input_file = std.fs.File.stdin();
-        },
-    }
-
-    switch (output_source) {
-        .file => {
-            output_file = try cwd().createFile(config.output.?, .{});
-        },
-        .stdout => {
-            output_file = std.fs.File.stdout();
-        },
-    }
+    const output_file: File = if (output_path) |p|
+        try cwd.createFile(io, p, .{})
+    else
+        File.stdout();
+    defer if (output_path != null) output_file.close(io);
 
     var in_buf: [1024]u8 = undefined;
-    var out_buf: [1024]u8 = undefined;
 
-    var file_reader = input_file.reader(&in_buf);
+    var file_reader = input_file.reader(io, &in_buf);
     const reader = &file_reader.interface;
-    var file_writer = output_file.writer(&out_buf);
+    var file_writer = output_file.writer(io, &out_buf);
     const writer = &file_writer.interface;
 
-    var arena = ArenaAllocator.init(std.heap.page_allocator);
+    var arena = ArenaAllocator.init(init.gpa);
     defer arena.deinit();
     const allocator = arena.allocator();
 
@@ -104,16 +67,25 @@ fn processConfig() !void {
     });
 }
 
-const cwd = std.fs.cwd;
+const usage =
+    \\Usage: bbcodez [options]
+    \\
+    \\Convert BBCode to Markdown.
+    \\
+    \\Options:
+    \\  -i, --input <file>         Input file (default: stdin)
+    \\  -o, --output <file>        Output file (default: stdout)
+    \\      --convert-tab-size <n> Convert tabs to n spaces [0-255]
+    \\  -h, --help                 Show this help
+    \\
+;
+
 const renderDocument = lib.fmt.md.renderDocument;
 
-const File = std.fs.File;
-const AnyReader = std.io.AnyReader;
-const AnyWriter = std.io.AnyWriter;
+const File = std.Io.File;
 const ArenaAllocator = std.heap.ArenaAllocator;
 const Level = std.log.Level;
 const Options = std.Options;
 
 const std = @import("std");
-const cli = @import("cli");
-const lib = @import("lib");
+const lib = @import("bbcodez");

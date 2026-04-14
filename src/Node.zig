@@ -238,7 +238,7 @@ pub fn print(self: Node, writer: anytype, depth: usize) !void {
 pub const NodePrinter = struct {
     const indent_size = 4;
 
-    writer: *std.io.Writer,
+    writer: *std.Io.Writer,
     depth: usize = 0,
     indent: bool = true,
 

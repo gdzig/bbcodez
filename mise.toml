@@ -1,5 +1,5 @@
 [tools]
-zig = "0.15.1"
-zls = "0.15.0"
+zig = "0.16.0"
+zls = "0.16.0"
 pre-commit = "latest"
 "ubi:DonIsaac/zlint" = "latest"
