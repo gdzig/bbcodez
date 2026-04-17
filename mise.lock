@@ -46,33 +46,69 @@ url = "https://github.com/DonIsaac/zlint/releases/download/v0.7.9/zlint-windows-
 url_api = "https://api.github.com/repos/DonIsaac/zlint/releases/assets/273295158"
 provenance = "github-attestations"
 
-[[tools.pre-commit]]
-version = "4.5.0"
-backend = "aqua:pre-commit/pre-commit"
+[[tools.hk]]
+version = "1.42.0"
+backend = "aqua:jdx/hk"
 
-[tools.pre-commit."platforms.linux-arm64"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.linux-arm64"]
+checksum = "sha256:291ed6215703fc3aa6a9fcbb96a72b88751c50888a00a6a73140ae0fbc3eef70"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-aarch64-unknown-linux-gnu.tar.gz"
 
-[tools.pre-commit."platforms.linux-arm64-musl"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.linux-arm64-musl"]
+checksum = "sha256:291ed6215703fc3aa6a9fcbb96a72b88751c50888a00a6a73140ae0fbc3eef70"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-aarch64-unknown-linux-gnu.tar.gz"
 
-[tools.pre-commit."platforms.linux-x64"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.linux-x64"]
+checksum = "sha256:a4f8898a83c1521c3e184b8af613ddf8d121df21a4026c679b18b54e8b5953db"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-x86_64-unknown-linux-gnu.tar.gz"
 
-[tools.pre-commit."platforms.linux-x64-musl"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.linux-x64-musl"]
+checksum = "sha256:a4f8898a83c1521c3e184b8af613ddf8d121df21a4026c679b18b54e8b5953db"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-x86_64-unknown-linux-gnu.tar.gz"
 
-[tools.pre-commit."platforms.macos-arm64"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.macos-arm64"]
+checksum = "sha256:29c4d4aabda87ed8e0a3bcd97cffe288a6932f22ae0a49d77f8a1bb9430afdbe"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-aarch64-apple-darwin.tar.gz"
 
-[tools.pre-commit."platforms.macos-x64"]
-checksum = "sha256:fbbfa47d19b98e03eb11963094ac3644a97cba105a8c660d8dab4c409c89cebe"
-url = "https://github.com/pre-commit/pre-commit/releases/download/v4.5.0/pre-commit-4.5.0.pyz"
+[tools.hk."platforms.windows-x64"]
+checksum = "sha256:9706dab06f3ed468bb1247ce540dad677acea7bc9a023e8cdbdc5f79b2e4015a"
+url = "https://github.com/jdx/hk/releases/download/v1.42.0/hk-x86_64-pc-windows-msvc.zip"
+
+[[tools.pkl]]
+version = "0.30.0"
+backend = "aqua:apple/pkl"
+
+[tools.pkl."platforms.linux-arm64"]
+checksum = "sha256:a876085548bba146854d0e96df16df828a8b39d75b57674eb3ad73edd9e52d96"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-aarch64"
+
+[tools.pkl."platforms.linux-arm64-musl"]
+checksum = "sha256:a876085548bba146854d0e96df16df828a8b39d75b57674eb3ad73edd9e52d96"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-aarch64"
+
+[tools.pkl."platforms.linux-x64"]
+checksum = "sha256:182a50a2c84bb002010ea45c8982c1e63b54e7e6a40e939bb5eb70beaad38cd7"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64"
+
+[tools.pkl."platforms.linux-x64-musl"]
+checksum = "sha256:182a50a2c84bb002010ea45c8982c1e63b54e7e6a40e939bb5eb70beaad38cd7"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-linux-amd64"
+
+[tools.pkl."platforms.macos-arm64"]
+checksum = "sha256:923a636f2c858029d9bf93f35aeae58ebd9783fbe0209f4787c4eed950142212"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-macos-aarch64"
+
+[tools.pkl."platforms.macos-x64"]
+checksum = "sha256:215c5c2b02bf4bfb5f7421d4bd81ce1f8781cc9aba93b09f86156c99553de143"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-macos-amd64"
+
+[tools.pkl."platforms.windows-x64"]
+checksum = "sha256:3af84f8f6753ae6cfab50f7127fbfb3b53d374c03079ca0cec27eddffc492b3c"
+url = "https://github.com/apple/pkl/releases/download/0.30.0/pkl-windows-amd64.exe"
+
+[[tools.yamllint]]
+version = "1.38.0"
+backend = "pipx:yamllint"
 
 [[tools.zig]]
 version = "0.16.0"
