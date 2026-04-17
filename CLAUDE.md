@@ -17,17 +17,19 @@ zig build run          # Run the bbcodez executable
 ```
 
 ### Code Quality
-The project uses pre-commit hooks with the following linters:
-```bash
-zlint --deny-warnings --fix   # Run zlint for Zig code quality
-zig fmt                        # Format Zig code
-```
+The project uses [hk](https://hk.jdx.dev/) for git hooks (configured in `hk.pkl`).
 
-Pre-commit hooks automatically run:
-- `zig fmt` for formatting
-- `zig build` to ensure compilation
-- `zig build test` to run tests
-- `zlint --deny-warnings --fix` for linting
+Pre-commit hooks (run on `git commit`):
+- `trailing_whitespace`, `newlines`, `yamllint`, `check_added_large_files`
+- `zig fmt` (fix mode) on `*.zig`
+- `zlint --deny-warnings --fix` on `*.zig`
+
+Pre-push hooks (run on `git push`):
+- `zig build`
+- `zig build test`
+
+To install the git hooks after cloning: `hk install`
+To run a hook manually: `hk run pre-commit` / `hk run pre-push`
 
 ## Architecture
 
@@ -92,4 +94,4 @@ Tests are embedded in each module using Zig's built-in testing framework. Run `z
 ## Dependencies
 
 - Uses `cli` dependency for command-line argument parsing in the executable
-- Requires Zig 0.15.1 (specified in `mise.toml`)
+- Requires Zig 0.16.0 (specified in `mise.toml`)

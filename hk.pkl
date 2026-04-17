@@ -1,0 +1,45 @@
+amends "package://github.com/jdx/hk/releases/download/v1.42.0/hk@1.42.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.42.0/hk@1.42.0#/Builtins.pkl"
+
+local linters: Mapping<String, Step> = new {
+    ["trailing_whitespace"] = (Builtins.trailing_whitespace) {
+        exclude = List("snapshots/**")
+    }
+    ["newlines"] = (Builtins.newlines) {
+        exclude = List("snapshots/**")
+    }
+    ["check_added_large_files"] = Builtins.check_added_large_files
+    ["yamllint"] = (Builtins.yamllint) {
+        check = "yamllint {{files}}"
+    }
+    ["zig_fmt"] = new Step {
+        glob = List("*.zig")
+        check = "zig fmt --check {{files}}"
+        fix = "zig fmt {{files}}"
+    }
+    ["zlint"] = new Step {
+        glob = List("*.zig")
+        check = "zlint --deny-warnings {{files}}"
+        fix = "zlint --deny-warnings --fix {{files}}"
+    }
+}
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        stash = "git"
+        steps = linters
+    }
+    ["pre-push"] {
+        steps {
+            ["zig_build"] {
+                exclusive = true
+                check = "zig build"
+            }
+            ["zig_build_test"] {
+                exclusive = true
+                check = "zig build test"
+            }
+        }
+    }
+}

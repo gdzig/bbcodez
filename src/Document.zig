@@ -74,7 +74,7 @@ pub const Options = struct {
 ///
 /// Args:
 ///   bbcode: BBCode string to parse
-pub fn load(allocator: Allocator, reader: *std.io.Reader, options: Options) !Document {
+pub fn load(allocator: Allocator, reader: *std.Io.Reader, options: Options) !Document {
     var tokenizer_options: tokenizer.Options = options.tokenizer_options orelse .{};
     var parser_options: parser.Options = options.parser_options orelse .{};
 
@@ -105,7 +105,7 @@ pub fn load(allocator: Allocator, reader: *std.io.Reader, options: Options) !Doc
 /// Returns: A new Document containing the parsed tree structure
 /// Errors: OutOfMemory or any parsing errors from `load()`
 pub fn loadFromBuffer(allocator: Allocator, bbcode: []const u8, options: Options) !Document {
-    var fixed_reader = std.io.Reader.fixed(bbcode);
+    var fixed_reader = std.Io.Reader.fixed(bbcode);
     return try load(allocator, &fixed_reader, options);
 }
 

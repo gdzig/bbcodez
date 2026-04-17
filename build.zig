@@ -6,6 +6,8 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/root.zig"),
         .target = target,
         .optimize = optimize,
+        .link_libc = true,
+        .link_libcpp = true,
     });
 
     const lib = b.addLibrary(.{
@@ -13,8 +15,6 @@ pub fn build(b: *std.Build) void {
         .name = "bbcodez",
         .root_module = lib_mod,
     });
-    lib.linkLibC();
-    lib.linkLibCpp();
 
     var install = b.addInstallArtifact(lib, .{});
 
@@ -34,16 +34,12 @@ pub fn build(b: *std.Build) void {
     docs_step.dependOn(&install_docs.step);
     install.step.dependOn(docs_step);
 
-    const cli_dep = b.dependency("cli", .{});
-    const cli_mod = cli_dep.module("cli");
-
     const exe_mod = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
-    exe_mod.addImport("cli", cli_mod);
-    exe_mod.addImport("lib", lib_mod);
+    exe_mod.addImport("bbcodez", lib_mod);
 
     const exe = b.addExecutable(.{
         .name = "bbcodez",
