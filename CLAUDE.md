@@ -95,3 +95,17 @@ Tests are embedded in each module using Zig's built-in testing framework. Run `z
 
 - Uses `cli` dependency for command-line argument parsing in the executable
 - Requires Zig 0.16.0 (specified in `mise.toml`)
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are tracked in GitHub Issues for `gdzig/bbcodez`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+This repo uses the default five-role triage vocabulary. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+This repo uses a single-context domain documentation layout. See `docs/agents/domain.md`.
