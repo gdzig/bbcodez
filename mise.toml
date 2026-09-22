@@ -1,5 +1,5 @@
 [tools]
-zig = "0.16.0"
+zig = "master"
 zls = "0.16.0"
 hk = "1.42.0"
 pkl = "0.30.0"

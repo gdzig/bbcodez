@@ -542,4 +542,4 @@ const std = @import("std");
 const testing = std.testing;
 const logger = std.log.scoped(.markdown_formatter);
 
-const spaces: []const u8 = " " ** 255;
+const spaces: [255]u8 = @splat(' ');

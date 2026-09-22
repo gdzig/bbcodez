@@ -22,7 +22,7 @@ pub fn main(init: std.process.Init) !void {
             input_path = args.next() orelse return error.MissingArgValue;
         } else if (std.mem.eql(u8, arg, "--output") or std.mem.eql(u8, arg, "-o")) {
             output_path = args.next() orelse return error.MissingArgValue;
-        } else if (std.mem.eql(u8, arg, "--convert-tab-size")) {
+        } else if (std.mem.eql(u8, arg, "--convert-tab-size") or std.mem.eql(u8, arg, "--convert_tab_size")) {
             convert_tab_size_str = args.next() orelse return error.MissingArgValue;
         }
     }
@@ -50,7 +50,6 @@ pub fn main(init: std.process.Init) !void {
     defer if (output_path != null) output_file.close(io);
 
     var in_buf: [1024]u8 = undefined;
-
     var file_reader = input_file.reader(io, &in_buf);
     const reader = &file_reader.interface;
     var file_writer = output_file.writer(io, &out_buf);
@@ -66,6 +65,7 @@ pub fn main(init: std.process.Init) !void {
     try renderDocument(allocator, document, writer, .{
         .convert_tab_size = convert_tab_size,
     });
+    try writer.flush();
 }
 
 const usage =

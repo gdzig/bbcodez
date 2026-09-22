@@ -927,7 +927,7 @@ test "newlines in tags" {
 
 test "long content stress test" {
     // Create long tag name
-    const long_tag_name = "a" ** 1000;
+    const long_tag_name: [1000]u8 = @splat('a');
     const long_tag = "[" ++ long_tag_name ++ "]content[/" ++ long_tag_name ++ "]";
 
     var parsed = try tokenizeBuffer(testing.allocator, long_tag, .{});
@@ -936,7 +936,7 @@ test "long content stress test" {
 
     const opening = iterator.next().?;
     try testing.expectEqual(TokenType.element, opening.type);
-    try testing.expectEqualStrings(long_tag_name, opening.name);
+    try testing.expectEqualStrings(&long_tag_name, opening.name);
 
     const content = iterator.next().?;
     try testing.expectEqual(TokenType.text, content.type);
@@ -944,7 +944,7 @@ test "long content stress test" {
 
     const closing = iterator.next().?;
     try testing.expectEqual(TokenType.closingElement, closing.type);
-    try testing.expectEqualStrings(long_tag_name, closing.name);
+    try testing.expectEqualStrings(&long_tag_name, closing.name);
 
     try testing.expectEqual(null, iterator.next());
 }
