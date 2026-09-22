@@ -1,1 +1,1 @@
-**Hello**, world! *italic* underline [s]strike
+**Hello**, world! *italic* underline ~~strike~~
