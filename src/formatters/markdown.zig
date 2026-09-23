@@ -7,6 +7,7 @@
 //! ## Supported Conversions
 //! - `[b]text[/b]` → `**text**`
 //! - `[i]text[/i]` → `*text*`
+//! - `[s]text[/s]` → `~~text~~`
 //! - `[url=link]text[/url]` → `[text](link)`
 //! - `[email=addr]text[/email]` → `[text](mailto:addr)`
 //! - `[code]text[/code]` → `` `text` ``
@@ -116,6 +117,7 @@ pub const MarkdownElement = enum {
     list,
     listItem,
     underline,
+    strikethrough,
     noOp,
 };
 
@@ -131,6 +133,7 @@ const element_map = std.StaticStringMap(MarkdownElement).initComptime(&.{
     .{ "list", .list },
     .{ "*", .listItem },
     .{ "u", .underline },
+    .{ "s", .strikethrough },
 });
 
 /// Renders a BBCode document as Markdown text.
@@ -224,6 +227,7 @@ pub fn writeElement(node: Node, element: MarkdownElement, ctx: *const WriteConte
         .list => try writeListElement(node, ctx),
         .listItem => try writeListItemElement(node, ctx),
         .underline => try writeUnderlineElement(node, ctx),
+        .strikethrough => try writeStrikethroughElement(node, ctx),
         .noOp => try writeNoOpElement(node, ctx),
     }
 }
@@ -342,6 +346,12 @@ pub fn writeItalicElement(node: Node, ctx: *const WriteContext) !void {
     try ctx.writer.writeAll("*");
 }
 
+pub fn writeStrikethroughElement(node: Node, ctx: *const WriteContext) !void {
+    try ctx.writer.writeAll("~~");
+    try render(node, ctx);
+    try ctx.writer.writeAll("~~");
+}
+
 pub fn writeCodeElement(node: Node, ctx: *const WriteContext) !void {
     try ctx.writer.writeAll("`");
     try render(node, ctx);
@@ -389,6 +399,31 @@ pub fn writeEmailElement(node: Node, ctx: *const WriteContext) !void {
     } else {
         const text = try node.getText();
         try ctx.writer.print("[{0s}](mailto:{0s})", .{text});
+    }
+}
+
+test "strikethrough" {
+    const cases = [_]struct {
+        bbcode: []const u8,
+        markdown: []const u8,
+    }{
+        .{ .bbcode = "[s]strike[/s]", .markdown = "~~strike~~" },
+        .{ .bbcode = "before [s]strike[/s] after", .markdown = "before ~~strike~~ after" },
+        .{
+            .bbcode = "[s]strike [b]bold[/b] and [i]italic[/i][/s]",
+            .markdown = "~~strike **bold** and *italic*~~",
+        },
+    };
+
+    for (cases) |case| {
+        var document = try Document.loadFromBuffer(testing.allocator, case.bbcode, .{});
+        defer document.deinit();
+
+        var output = std.Io.Writer.Allocating.init(testing.allocator);
+        defer output.deinit();
+
+        try renderDocument(testing.allocator, document, &output.writer, .{});
+        try testing.expectEqualStrings(case.markdown, output.written());
     }
 }
 
@@ -480,6 +515,20 @@ test "single lines" {
         defer document.deinit();
 
         var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_italic.md", .{});
+        defer file.close(testing.io);
+
+        var buf: [1024]u8 = undefined;
+        var file_writer = file.writer(testing.io, &buf);
+        var writer = &file_writer.interface;
+        try renderDocument(testing.allocator, document, writer, .{});
+        try writer.flush();
+    }
+
+    {
+        var document = try Document.loadFromBuffer(testing.allocator, "[s]strike[/s]", .{});
+        defer document.deinit();
+
+        var file = try std.Io.Dir.cwd().createFile(testing.io, "snapshots/md/single_line_strikethrough.md", .{});
         defer file.close(testing.io);
 
         var buf: [1024]u8 = undefined;

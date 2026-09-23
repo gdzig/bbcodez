@@ -69,23 +69,23 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_lib_unit_tests.step);
     test_step.dependOn(&run_exe_unit_tests.step);
 
-    const diff = b.addSystemCommand(&.{
-        "git",
-        "diff",
-        "--cached", // see git_add comment
-        "--exit-code",
-    });
-    diff.addDirectoryArg(b.path("snapshots/"));
-
-    test_step.dependOn(&diff.step);
-
-    const git_add = b.addSystemCommand(&.{
-        "git",
-        "add",
-        "snapshots/",
+    const snapshot_check_mod = b.createModule(.{
+        .root_source_file = b.path("tools/check_snapshots.zig"),
+        .target = target,
+        .optimize = optimize,
     });
 
-    diff.step.dependOn(&git_add.step);
+    const snapshot_check = b.addExecutable(.{
+        .name = "check-snapshots",
+        .root_module = snapshot_check_mod,
+    });
+
+    const run_snapshot_check = b.addRunArtifact(snapshot_check);
+    run_snapshot_check.stdio = .inherit;
+    run_snapshot_check.has_side_effects = true;
+    run_snapshot_check.addDirectoryArg(b.path("snapshots"));
+    run_snapshot_check.step.dependOn(&run_lib_unit_tests.step);
+    test_step.dependOn(&run_snapshot_check.step);
 }
 
 const std = @import("std");
