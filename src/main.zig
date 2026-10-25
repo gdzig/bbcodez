@@ -81,12 +81,11 @@ const usage =
     \\
 ;
 
-const renderDocument = lib.fmt.md.renderDocument;
-
+const std = @import("std");
 const File = std.Io.File;
 const ArenaAllocator = std.heap.ArenaAllocator;
 const Level = std.log.Level;
 const Options = std.Options;
 
-const std = @import("std");
 const lib = @import("bbcodez");
+const renderDocument = lib.fmt.md.renderDocument;
