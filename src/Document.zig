@@ -160,7 +160,7 @@ pub fn print(self: Document, writer: anytype) !void {
 /// Returns: A new Walker for iterating through nodes
 /// Errors: OutOfMemory if walker initialization fails
 pub fn walk(self: Document, allocator: Allocator, order: Walker.TraversalOrder) !Walker {
-    return Walker.init(self, allocator, order);
+    return .init(self, allocator, order);
 }
 
 /// Tree walker for traversing all nodes in a document.
@@ -280,10 +280,11 @@ pub const Walker = struct {
     }
 };
 
-const std = @import("std");
 const Document = @This();
-const Node = @import("Node.zig");
+const std = @import("std");
 const Allocator = std.mem.Allocator;
+
+const Node = @import("Node.zig");
 const parser = @import("parser.zig");
 const shared = @import("shared.zig");
 const tokenizer = @import("tokenizer.zig");

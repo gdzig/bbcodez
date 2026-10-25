@@ -1,5 +1,3 @@
-const std = @import("std");
-
 const RepositoryKind = enum { jj, git, unknown };
 
 pub fn main(init: std.process.Init) !void {
@@ -164,3 +162,5 @@ fn fatal(io: std.Io, comptime fmt: []const u8, args: anytype) !void {
     try writer.interface.print(fmt, args);
     try writer.interface.flush();
 }
+
+const std = @import("std");

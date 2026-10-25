@@ -340,8 +340,10 @@ pub const Iterator = struct {
 /// Args:
 ///   opts: Configuration options including optional type filter
 /// Returns: A new Iterator for the children
-pub fn iterator(self: Node, opts: struct { type: ?Type = null }) Iterator {
-    return Iterator{
+pub fn iterator(self: Node, opts: struct {
+    type: ?Type = null,
+}) Iterator {
+    return .{
         .type = opts.type,
         .node = self,
         .index = 0,

@@ -17,10 +17,10 @@ local linters: Mapping<String, Step> = new {
         check = "zig fmt --check {{files}}"
         fix = "zig fmt {{files}}"
     }
-    ["zlint"] = new Step {
+    ["gdzig-zlint"] = new Step {
         glob = List("*.zig")
-        check = "zlint --deny-warnings {{files}}"
-        fix = "zlint --deny-warnings --fix {{files}}"
+        check = "gdzig-zlint {{files}}"
+        fix = "gdzig-zlint --fix {{files}}"
     }
 }
 

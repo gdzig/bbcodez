@@ -201,7 +201,7 @@ pub const TokenResult = struct {
     };
 
     pub fn iterator(self: TokenResult) Iterator {
-        return Iterator{
+        return .{
             .tokens = self,
             .index = 0,
         };
@@ -1189,8 +1189,8 @@ test "hypenated parameter" {
     try testing.expectEqual(null, it.next());
 }
 
-const StringHashMap = std.StringHashMapUnmanaged;
-
 const std = @import("std");
+const StringHashMap = std.StringHashMapUnmanaged;
 const testing = std.testing;
+
 const shared = @import("shared.zig");

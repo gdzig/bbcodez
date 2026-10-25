@@ -236,13 +236,16 @@ test "complex parsing" {
     // std.debug.print("Document: {s}\n", .{document});
 }
 
-const testing = std.testing;
-const Token = tokenizer.TokenResult.Token;
-const ArrayList = std.ArrayListUnmanaged;
-const TokenResult = tokenizer.TokenResult;
-
 const std = @import("std");
-const Node = @import("Node.zig");
-const shared = @import("shared.zig");
+const testing = std.testing;
+const ArrayList = std.ArrayListUnmanaged;
+
 const Document = @import("Document.zig");
+
+const Node = @import("Node.zig");
+
+const shared = @import("shared.zig");
+
 const tokenizer = @import("tokenizer.zig");
+const Token = tokenizer.TokenResult.Token;
+const TokenResult = tokenizer.TokenResult;
